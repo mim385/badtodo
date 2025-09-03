@@ -1,0 +1,35 @@
+# https://0xdbe.github.io/GitHub-HowToEnableCodeScanningWithSemgrep/
+
+name: Semgrep Differential Scan
+on:
+  pull_request
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true   # 古い実行をキャンセル
+
+jobs:
+
+  semgrep-diff:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    container:
+      image: returntocorp/semgrep
+
+    steps:
+
+      # step 1
+      - name: clone application source code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # step 2
+      - name: differential scan
+        run: |
+          semgrep scan \
+            --error \
+            --metrics=off \
+            --baseline-commit $ \
+            --config="p/default"

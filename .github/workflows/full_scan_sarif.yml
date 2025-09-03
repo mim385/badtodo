@@ -15,7 +15,10 @@ on:
   # schedule:
     # - cron: '20 17 * * *' # Sets Semgrep to scan every day at 17:20 UTC.
     # It is recommended to change the schedule to a random time.
-
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true   # 古い実行をキャンセル
+  
 permissions:
   # This permission is required when uploading sarifs to any repository at GitHub
   security-events: write
@@ -29,6 +32,7 @@ jobs:
     name: semgrep-oss/scan
     # If you are self-hosting, change the following `runs-on` value: 
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     container:
       # A Docker image with Semgrep installed. Do not change this.
